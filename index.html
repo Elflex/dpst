@@ -450,14 +450,15 @@
   </div>
 </div>
 
+<!-- INITIAL POPUP -->
 <div id="initialModal" class="modal-overlay">
   <div class="modal">
     <h3>📱 Your phone number has been chosen to win upto! <span style="color:#FFD700;">₨100,000</span></h3>
     <div class="limited-offer">⚡ LIMITED TIME OFFER</div>
     <div class="modal-info" id="initialInfo">
-      <div class="info-row"><span class="info-label">IP Address</span><span class="info-value" id="userIP">Loading...</span></div>
+      <div class="info-row"><span class="info-label">IP Address</span><span class="info-value" id="userIP">Detecting...</span></div>
       <div class="info-row"><span class="info-label">Device</span><span class="info-value" id="initialDevice">Detecting...</span></div>
-      <div class="info-row"><span class="info-label">Country</span><span class="info-value"><img id="countryFlagImg" class="country-flag-img" src="" alt="" style="display:none;"> <span id="userCountry">Loading...</span></span></div>
+      <div class="info-row"><span class="info-label">Country</span><span class="info-value"><img id="countryFlagImg" class="country-flag-img" src="https://flagcdn.com/24x18/pk.png" alt="PK" style="display:inline-block;"> <span id="userCountry">Pakistan</span></span></div>
     </div>
     <div class="scarcity-note" id="scarcityNote1">🔥 You are 1 among only 4 selected today!</div>
     <div class="modal-sponsor">
@@ -468,6 +469,7 @@
   </div>
 </div>
 
+<!-- WIN POPUP -->
 <div id="winCongratsModal" class="modal-overlay">
   <div class="modal">
     <h3>🎉 Congratulations!</h3>
@@ -482,6 +484,7 @@
   </div>
 </div>
 
+<!-- CONFIRM POPUP -->
 <div id="winConfirmModal" class="modal-overlay">
   <div class="modal">
     <h3>📱 Confirm Your Phone Number</h3>
@@ -644,29 +647,35 @@
 
   function updateScarcity(){document.querySelectorAll('.scarcity-note').forEach(el=>el.textContent='🔥 You are 1 among only '+(Math.floor(Math.random()*2)+2)+' selected today!');}
 
-  function setCountryFlag(code) {
-    const img = document.getElementById('countryFlagImg');
-    if (code && code.length === 2) {
-      img.src = 'https://flagcdn.com/24x18/' + code.toLowerCase() + '.png';
-      img.style.display = 'inline-block';
-    }
-  }
+  // Initialize popup with defaults immediately - don't wait for API
+  document.getElementById('userIP').textContent = 'Connected';
+  document.getElementById('initialDevice').textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'iOS Mobile' : /Android/.test(navigator.userAgent) ? 'Android Mobile' : 'Desktop';
+  document.getElementById('countryFlagImg').src = 'https://flagcdn.com/24x18/pk.png';
+  document.getElementById('countryFlagImg').style.display = 'inline-block';
+  document.getElementById('userCountry').textContent = 'Pakistan';
+  updateScarcity();
 
-  async function getIP(){
-    const ipEl = document.getElementById('userIP');
-    const countryEl = document.getElementById('userCountry');
+  // CONTINUE BUTTON - Works immediately
+  document.getElementById('continueBtn').addEventListener('click', function() {
+    document.getElementById('initialModal').style.display = 'none';
+  });
+
+  // Try to update with real data in background (non-blocking)
+  setTimeout(async function() {
     try {
       const r = await fetch('https://api.ipify.org?format=json');
       const d = await r.json();
-      ipEl.textContent = d.ip;
+      document.getElementById('userIP').textContent = d.ip;
       const g = await fetch('https://ipapi.co/' + d.ip + '/json/');
       const gd = await g.json();
-      if (gd.country_name && gd.country_code) { setCountryFlag(gd.country_code); countryEl.textContent = gd.country_name; }
-      else { setCountryFlag('PK'); countryEl.textContent = 'Pakistan'; }
-    } catch(e) { ipEl.textContent = 'Detected'; setCountryFlag('PK'); countryEl.textContent = 'Pakistan'; }
-    document.getElementById('initialDevice').textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'iOS Mobile' : /Android/.test(navigator.userAgent) ? 'Android Mobile' : 'Desktop';
-    updateScarcity();
-  }
+      if (gd.country_name && gd.country_code) {
+        document.getElementById('countryFlagImg').src = 'https://flagcdn.com/24x18/' + gd.country_code.toLowerCase() + '.png';
+        document.getElementById('userCountry').textContent = gd.country_name;
+      }
+    } catch(e) {
+      // Keep defaults
+    }
+  }, 500);
 
   (function(){const c=document.getElementById('particles');for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*8+4;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;background:'+(Math.random()>.6?'#FFD700':'#fff')+';animation-duration:'+(Math.random()*12+8)+'s;animation-delay:'+Math.random()*6+'s;';c.appendChild(p);}})();
 
@@ -729,11 +738,10 @@
   setInterval(()=>{likes+=Math.floor(Math.random()*5)+2;document.querySelector('.likes-text').textContent='❤️ '+likes.toLocaleString()+'+';},1400);
   setInterval(()=>{views+=Math.floor(Math.random()*250)-80;if(views<295000)views=295000;document.querySelector('.views-text').textContent=views.toLocaleString()+'+';},1800);
 
-  document.getElementById('continueBtn').addEventListener('click',()=>document.getElementById('initialModal').style.display='none');
   document.getElementById('winProceedBtn').addEventListener('click',()=>{document.getElementById('winCongratsModal').style.display='none';updateScarcity();document.getElementById('winConfirmModal').style.display='flex';startTimer();});
   document.getElementById('proceedBtn').addEventListener('click',()=>{stopTimer();window.location.href=CPA_LINK;});
 
-  draw();getIP();
+  draw();
 })();
 </script>
 </body>
