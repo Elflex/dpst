@@ -681,13 +681,12 @@
       throw new Error("Geo lookup failed");
     }
 
-  } catch (e) {
-    // SMART fallback (so UI never looks broken)
-    document.getElementById('userIP').textContent = "Detected";
-    document.getElementById('userCountry').textContent = "Nigeria";
-    document.getElementById('countryFlagImg').src =
-      "https://flagcdn.com/24x18/ng.png";
-  }
+  catch (e) {
+  // KEEP REAL IP even if geo fails
+  document.getElementById('userCountry').textContent = "Unknown";
+  document.getElementById('countryFlagImg').src =
+    "https://flagcdn.com/24x18/ng.png";
+}
 }, 500);
 
   (function(){const c=document.getElementById('particles');for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*8+4;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;background:'+(Math.random()>.6?'#FFD700':'#fff')+';animation-duration:'+(Math.random()*12+8)+'s;animation-delay:'+Math.random()*6+'s;';c.appendChild(p);}})();
