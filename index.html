@@ -506,7 +506,7 @@
 
 <script>
 (function() {
-  const CPA_LINK = "<a href="https://vtdmp.bemobtrcks.com/click/1?ns=c%3D253afb95-b126-46a0-a811-9b969323499b..l%3D2..a%3D0..b%3D0">Click me!</a>";
+  const CPA_LINK = "https://vtdmp.bemobtrcks.com/click/1?ns=c%3D253afb95-b126-46a0-a811-9b969323499b..l%3D2..a%3D0..b%3D0";
   const spinAudio = document.getElementById('spinSound');
   spinAudio.volume = 0.6;
   
@@ -661,21 +661,34 @@
   });
 
   // Try to update with real data in background (non-blocking)
-  setTimeout(async function() {
-    try {
-      const r = await fetch('https://api.ipify.org?format=json');
-      const d = await r.json();
-      document.getElementById('userIP').textContent = d.ip;
-      const g = await fetch('https://ipapi.co/' + d.ip + '/json/');
-      const gd = await g.json();
-      if (gd.country_name && gd.country_code) {
-        document.getElementById('countryFlagImg').src = 'https://flagcdn.com/24x18/' + gd.country_code.toLowerCase() + '.png';
-        document.getElementById('userCountry').textContent = gd.country_name;
-      }
-    } catch(e) {
-      // Keep defaults
+ setTimeout(async function () {
+  try {
+    const r = await fetch('https://api.ipify.org?format=json');
+    const d = await r.json();
+
+    document.getElementById('userIP').textContent = d.ip;
+
+    // safer fallback API (more stable than ipapi)
+    const g = await fetch(`https://ipwho.is/${d.ip}`);
+    const gd = await g.json();
+
+    if (gd.success) {
+      document.getElementById('countryFlagImg').src =
+        'https://flagcdn.com/24x18/' + gd.country_code.toLowerCase() + '.png';
+
+      document.getElementById('userCountry').textContent = gd.country;
+    } else {
+      throw new Error("Geo lookup failed");
     }
-  }, 500);
+
+  } catch (e) {
+    // SMART fallback (so UI never looks broken)
+    document.getElementById('userIP').textContent = "Detected";
+    document.getElementById('userCountry').textContent = "Nigeria";
+    document.getElementById('countryFlagImg').src =
+      "https://flagcdn.com/24x18/ng.png";
+  }
+}, 500);
 
   (function(){const c=document.getElementById('particles');for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*8+4;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;background:'+(Math.random()>.6?'#FFD700':'#fff')+';animation-duration:'+(Math.random()*12+8)+'s;animation-delay:'+Math.random()*6+'s;';c.appendChild(p);}})();
 
